@@ -1,13 +1,8 @@
 {
   "allowedUsers": [
-    "v1adlenn",
-    "Mariachi",
-    "chubzarik_dota"
+    "BeCeJlblu",
   ],
   "adminUsers": [
-    "v1adlenn",
-    "Mariachi",
-    "chubzarik_dota"
+    "BeCeJlblu",
   ],
-  "description": "Список разрешенных пользователей для MMR виджета. Добавьте никнеймы стримеров, которым разрешено использовать виджет."
 } 
