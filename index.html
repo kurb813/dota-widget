@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MMR Tracker Widget - Виджет для OBS</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: start;
+        }
+        
+        .widget-preview {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .widget-preview h2 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .preview-frame {
+            width: 100%;
+            height: 200px;
+            border: none;
+            border-radius: 12px;
+            background: rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
+        }
+        
+        .instructions {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .instructions h2 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .step {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border-left: 4px solid #00ff88;
+        }
+        
+        .step h3 {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #00ff88;
+        }
+        
+        .url-input {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            padding: 10px 15px;
+            color: white;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            width: 100%;
+            margin: 10px 0;
+        }
+        
+        .url-input:focus {
+            outline: none;
+            border-color: #00ff88;
+            box-shadow: 0 0 0 2px rgba(0, 255, 136, 0.2);
+        }
+        
+        .copy-btn {
+            background: #00ff88;
+            color: #000;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            margin-left: 10px;
+        }
+        
+        .copy-btn:hover {
+            background: #00e67a;
+            transform: translateY(-1px);
+        }
+        
+        .copy-btn:active {
+            transform: translateY(0);
+        }
+        
+        .github-link {
+            text-align: center;
+            margin-top: 40px;
+        }
+        
+        .github-link a {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            text-decoration: none;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .github-link a:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .features {
+            grid-column: 1 / -1;
+            margin-top: 40px;
+        }
+        
+        .features h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2rem;
+            font-weight: 600;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .feature {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .feature h3 {
+            color: #00ff88;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .container {
+                padding: 20px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎮 MMR Tracker Widget</h1>
+            <p>Профессиональный виджет для отображения MMR в OBS Studio. Поддерживает настройку игрока, отображение ранга и истории матчей.</p>
+        </div>
+        
+        <div class="content">
+            <div class="widget-preview">
+                <h2>Предварительный просмотр</h2>
+                <iframe class="preview-frame" src="widget.html?player=demo&mmr=6420&rank=immortal"></iframe>
+                <p>Виджет автоматически обновляется и показывает текущий MMR, ранг игрока и последние результаты матчей с красивыми анимациями.</p>
+            </div>
+            
+            <div class="instructions">
+                <h2>Как использовать в OBS</h2>
+                
+                <div class="step">
+                    <h3>Шаг 1: Скопируйте URL</h3>
+                    <p>Введите имя игрока и скопируйте готовую ссылку:</p>
+                    <div style="display: flex; align-items: center; margin-top: 10px;">
+                        <input type="text" class="url-input" id="playerInput" placeholder="Введите никнейм игрока" value="v1adlenn">
+                        <button class="copy-btn" onclick="copyWidgetUrl()">Копировать</button>
+                    </div>
+                    <input type="text" class="url-input" id="widgetUrl" readonly>
+                </div>
+                
+                <div class="step">
+                    <h3>Шаг 2: Добавьте в OBS</h3>
+                    <p>1. Откройте OBS Studio<br>
+                    2. Добавьте источник "Браузер"<br>
+                    3. Вставьте скопированную ссылку в поле URL<br>
+                    4. Установите размер: 400x150 пикселей</p>
+                </div>
+                
+                <div class="step">
+                    <h3>Шаг 3: Настройте данные</h3>
+                    <p>Разместите файл <code>mmr_data.json</code> рядом с вашим основным приложением. Виджет будет автоматически читать данные из этого файла.</p>
+                </div>
+                
+                <div class="step">
+                    <h3>Шаг 4: Контроль доступа (опционально)</h3>
+                    <p>Виджет поддерживает систему разрешений. Отредактируйте файл <code>allowed_users.json</code> для контроля доступа. Пользователи, не включенные в список, увидят MMR = 1 и сообщение "STREAMER IS NOT ALLOWED".</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="features">
+            <h2>Возможности виджета</h2>
+            <div class="features-grid">
+                <div class="feature">
+                    <h3>🏆 Автоматическое определение ранга</h3>
+                    <p>Виджет автоматически определяет и показывает правильную иконку ранга на основе MMR</p>
+                </div>
+                <div class="feature">
+                    <h3>📊 История матчей</h3>
+                    <p>Отображение последних 10 результатов матчей с цветовой кодировкой</p>
+                </div>
+                <div class="feature">
+                    <h3>📺 Интеграция с Twitch</h3>
+                    <p>Показывает количество зрителей на Twitch в реальном времени</p>
+                </div>
+                <div class="feature">
+                    <h3>🎨 Красивые анимации</h3>
+                    <p>Плавные переходы, эффекты свечения и анимации обновления данных</p>
+                </div>
+                <div class="feature">
+                    <h3>⚡ Реальное время</h3>
+                    <p>Автоматическое обновление данных каждую секунду</p>
+                </div>
+                <div class="feature">
+                    <h3>🌐 Веб-технологии</h3>
+                    <p>Работает в любом браузере, включая OBS Browser Source</p>
+                </div>
+                <div class="feature">
+                    <h3>🔒 Контроль доступа</h3>
+                    <p>Система разрешений для контроля того, кто может использовать виджет</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="github-link">
+            <a href="https://github.com/yourusername/mmr-tracker-widget" target="_blank">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                </svg>
+                Исходный код на GitHub
+            </a>
+        </div>
+    </div>
+    
+    <script>
+        function updateWidgetUrl() {
+            const player = document.getElementById('playerInput').value || 'demo';
+            const baseUrl = window.location.origin + window.location.pathname.replace('index.html', '');
+            const widgetUrl = `${baseUrl}widget.html?player=${encodeURIComponent(player)}`;
+            document.getElementById('widgetUrl').value = widgetUrl;
+        }
+        
+        function copyWidgetUrl() {
+            updateWidgetUrl();
+            const urlInput = document.getElementById('widgetUrl');
+            urlInput.select();
+            document.execCommand('copy');
+            
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.textContent = 'Скопировано!';
+            btn.style.background = '#00e67a';
+            
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.style.background = '#00ff88';
+            }, 2000);
+        }
+        
+        // Обновляем URL при изменении имени игрока
+        document.getElementById('playerInput').addEventListener('input', updateWidgetUrl);
+        
+        // Инициализация
+        updateWidgetUrl();
+    </script>
+</body>
+</html> 
